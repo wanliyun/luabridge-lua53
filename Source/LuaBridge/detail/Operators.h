@@ -44,7 +44,6 @@ public:
 
 	static int sOperatorFun(lua_State * L)
 	{
-		typedef TypeList<T, TypeList<TRet> > params;
 		T a = Stack<T>::get(L, 1);
 		TRight b = Stack<TRight>::get(L, 2);
 

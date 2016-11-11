@@ -813,6 +813,21 @@ private:
 		return *this;
 	}
 
+	static int sToStringFun(lua_State * L)
+	{
+		T * a = Stack<T *>::get(L, 1);
+		std::string str;
+		a->LuaToString(str);
+		Stack <std::string >::push(L, str);
+		return 1;
+	}
+
+	Class <T>& addFunction__tostring()
+	{
+		addFunctionEx("__tostring", &sToStringFun);
+		return *this;
+	}
+
 #define LUA_BRIDGE_DECLARE_OPERATOR(NAME,TRET)\
 	template<typename TRIGHT=T>\
 	Class <T>& addOperator##NAME()\
