@@ -1,6 +1,11 @@
 <a href="http://lua.org">
 <img src="http://vinniefalco.github.com/LuaBridgeDemo/powered-by-lua.png">
 </a><br>
+# luabridge-lua53 0.1
+based on luabridge2.0. to support lua5.3.
+offers the following new features:
+- Support operators
+- Support int64 on stack
 
 # LuaBridge 2.0
 
@@ -23,6 +28,7 @@ LuaBridge offers the following features:
 - Easy access to Lua objects like tables and functions.
 - Written in a clear and easy to debug style.
 - Does not require C++11.
+- Support operators
 
 Please read the [LuaBridge Reference Manual][5] for more details on the API.
 
