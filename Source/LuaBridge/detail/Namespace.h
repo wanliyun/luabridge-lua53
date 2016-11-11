@@ -797,6 +797,40 @@ private:
       return *this;
     }
 
+
+	//--------------------------------------------------------------------------
+	/**
+	Add or replace a member function.
+	*/
+	template <class GFn>
+	Class <T>& addFunctionEx(char const* name, GFn gf)
+	{
+		assert(lua_istable(L, -1));
+		new (lua_newuserdata(L, sizeof(gf))) GFn(gf);
+		lua_pushcclosure(L, &CFunc::CallGlobalCFunction <T>::f, 1);
+		rawsetfield(L, -3, name); // class table
+
+		return *this;
+	}
+
+#define LUA_BRIDGE_DECLARE_OPERATOR(NAME,TRET)\
+	template<typename TRIGHT=T>\
+	Class <T>& addOperator##NAME()\
+	{\
+		return addFunctionEx(#NAME,&FunOperator<T,TRIGHT,TRET, EOp##NAME>::sOperatorFun);\
+	}
+
+	LUA_BRIDGE_DECLARE_OPERATOR(__add,T);
+	LUA_BRIDGE_DECLARE_OPERATOR(__sub,T);
+	LUA_BRIDGE_DECLARE_OPERATOR(__mul,T);
+	LUA_BRIDGE_DECLARE_OPERATOR(__div,T);
+
+	LUA_BRIDGE_DECLARE_OPERATOR(__eq, bool);
+	LUA_BRIDGE_DECLARE_OPERATOR(__lt, bool);
+	LUA_BRIDGE_DECLARE_OPERATOR(__le, bool);
+#undef  LUA_BRIDGE_DECLARE_OPERATOR
+
+
     //--------------------------------------------------------------------------
     /**
         Add or replace a member lua_CFunction.

@@ -368,6 +368,20 @@ struct CFunc
     }
   };
 
+
+  //////////////////////////////////////////////////////////////////////////
+  template <class T>
+  struct CallGlobalCFunction
+  {
+	  static int f(lua_State* L)
+	  {
+		  assert(isfulluserdata(L, lua_upvalueindex(1)));
+		  typedef int (*GP)(lua_State* L);
+		  GP const& fnptr = *static_cast <GP const*> (lua_touserdata(L, lua_upvalueindex(1)));
+		  assert(fnptr != 0);
+		  return (*fnptr) (L);
+	  }
+  };
   //--------------------------------------------------------------------------
 
   // SFINAE Helpers

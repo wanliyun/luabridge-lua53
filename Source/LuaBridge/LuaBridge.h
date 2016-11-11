@@ -102,6 +102,7 @@ private:
 
 #include "detail/Userdata.h"
 #include "detail/CFunctions.h"
+#include "detail/Operators.h"
 #include "detail/Namespace.h"
 
 //------------------------------------------------------------------------------
