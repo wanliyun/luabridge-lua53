@@ -29,6 +29,7 @@ LuaBridge offers the following features:
 - Written in a clear and easy to debug style.
 - Does not require C++11.
 - Support operators
+- Support Enum
 
 Please read the [LuaBridge Reference Manual][5] for more details on the API.
 
