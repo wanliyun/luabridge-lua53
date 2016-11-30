@@ -654,22 +654,55 @@ struct StackHelper <T, false>
 /**
   Lua stack conversions for class objects passed by value.
 */
+
+template <class T,bool isEnum>
+struct Stack_Impl
+{
+public:
+	static inline void push(lua_State* L, T const& t)
+	{
+		StackHelper <T,
+			TypeTraits::isContainer <T>::value>::push(L, t);
+	}
+
+	static inline T get(lua_State* L, int index)
+	{
+		return StackHelper <T,
+			TypeTraits::isContainer <T>::value>::get(L, index);
+	}
+	
+};
+
+template <class T>
+struct Stack_Impl<T,true>
+{
+public:
+	static inline void push(lua_State* L, T const& t)
+	{
+		Stack<lua_Integer>::push(L, (lua_Integer)t);
+	}
+
+	static inline T get(lua_State* L, int index)
+	{
+		return (T)Stack<lua_Integer>::get(L, index);
+	}
+};
+
 template <class T>
 struct Stack
 {
 public:
   static inline void push (lua_State* L, T const& t)
   {
-    StackHelper <T,
-      TypeTraits::isContainer <T>::value>::push (L, t);
+	  Stack_Impl<T, std::is_enum<T>::value>::push(L, t);
   }
 
   static inline T get (lua_State* L, int index)
   {
-    return StackHelper <T,
-      TypeTraits::isContainer <T>::value>::get (L, index);
+	  return Stack_Impl<T, std::is_enum<T>::value>::get(L, index);;
   }
 };
+
 
 //------------------------------------------------------------------------------
 /**

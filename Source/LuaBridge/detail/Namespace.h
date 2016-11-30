@@ -94,6 +94,17 @@ private:
   }
 
 private:
+	class CEnum
+	{
+	private:
+		CEnum& operator= (CEnum const& other);
+
+	protected:
+		friend class Namespace;
+
+		lua_State* const L;
+		int mutable m_stackSize;
+	};
   /**
     Factored base to reduce template instantiations.
   */
@@ -328,8 +339,8 @@ private:
     */
     void createStaticTable (char const* name)
     {
-      lua_newtable (L);
-      lua_newtable (L);
+      lua_newtable (L);				//[tb]
+      lua_newtable (L);		
       lua_pushvalue (L, -1);
       lua_setmetatable (L, -3);
       lua_insert (L, -2);
@@ -910,6 +921,58 @@ private:
     }
   };
 
+  class EnumClassBase : public ClassBase
+  {
+  public:
+	  EnumClassBase(lua_State *L) :ClassBase(L) {}
+	  Namespace endEnum()
+	  {
+		  return Namespace(this);
+	  }
+  };
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  //	-1  metatable
+  //	-2  (namespace)
+  //////////////////////////////////////////////////////////////////////////
+  template<typename T>
+  class EnumClass : public EnumClassBase
+  {
+  public:
+
+	  EnumClass(char const* name, Namespace const* parent) : EnumClassBase(parent->L)
+	  {
+		  m_stackSize = parent->m_stackSize + 1;
+		  parent->m_stackSize = 0;
+
+		  assert(lua_istable(L, -1));	//[namespace]
+		  rawgetfield(L, -1, name);		//[namespace][nil]
+
+		  assert(lua_isnil(L, -1));
+		  lua_pop(L, 1);				//[namespace]
+		  lua_newtable(L);				//[namespace][table]
+		  lua_newtable(L);				//[namespace][table][metatable]
+		  lua_pushvalue(L, -1);			//[namespace][table][metatable][metatable]
+		  lua_setmetatable(L, -3);		//[namespace][table][metatable]
+		  lua_insert(L, -2);			//[namespace][metatable][table]
+		  rawsetfield(L, -3, name);		//[namespace][metatable]
+
+		  lua_pushvalue(L, -1);			//[namespace][metatable][metatable]
+		  rawsetfield(L, -2, "__index");//[namespace][metatable]
+	  }
+
+	  // -1.metatable;
+	  // -2.namespace;
+	  EnumClass<T> & addEnum(const char * name, T val)
+	  {
+		  assert(lua_istable(L, -1));								//[metatable]
+		  lua_pushinteger(L, static_cast<lua_Integer>(val));		//[metatable][val]
+		  rawsetfield(L, -2, name);									//[metatable]
+		  return *this;
+	  }
+  };
+
 private:
   //----------------------------------------------------------------------------
   /**
@@ -993,7 +1056,13 @@ private:
     child->m_stackSize = 3;
     child->pop (3);
   }
-
+  explicit Namespace(EnumClassBase const* child)
+	  : L(child->L)
+	  , m_stackSize(child->m_stackSize - 1)
+  {
+	  child->m_stackSize = 1;
+	  child->pop(1);
+  }
 public:
   //----------------------------------------------------------------------------
   /**
@@ -1168,6 +1237,16 @@ public:
   Class <T> deriveClass (char const* name)
   {
     return Class <T> (name, this, ClassInfo <U>::getStaticKey ());
+  }
+
+  //----------------------------------------------------------------------------
+  /**
+  Open a new or existing enum for registrations.
+  */
+  template <class T>
+  EnumClass <T> beginEnum(char const* name)
+  {
+	  return EnumClass <T>(name, this);
   }
 };
 
