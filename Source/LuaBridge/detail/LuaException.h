@@ -79,7 +79,11 @@ public:
   template <class Exception>
   static void Throw (Exception e)
   {
-    throw e;
+#ifdef LUABRIDGE_NO_THROW_EXCEPTION
+		lua_writestringerror("exception:%s", e.what());
+#else
+		throw e;
+#endif
   }
 
   //----------------------------------------------------------------------------
