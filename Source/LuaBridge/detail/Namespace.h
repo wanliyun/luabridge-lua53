@@ -339,12 +339,12 @@ private:
     */
     void createStaticTable (char const* name)
     {
-      lua_newtable (L);				//[tb]
-      lua_newtable (L);		
-      lua_pushvalue (L, -1);
-      lua_setmetatable (L, -3);
-      lua_insert (L, -2);
-      rawsetfield (L, -5, name);
+      lua_newtable (L);				//[nm][const][class][tb]
+      lua_newtable (L);				//[nm][const][class][tb][tb2]
+      lua_pushvalue (L, -1);		//[nm][const][class][tb][tb2][tb2]
+      lua_setmetatable (L, -3);		//[nm][const][class][tb][tb2]
+      lua_insert (L, -2);			//[nm][const][class][tb2][tb]
+      rawsetfield (L, -5, name);	//[nm][const][class][tb2]
 
 #if 0
       lua_pushlightuserdata (L, this);
@@ -360,8 +360,8 @@ private:
       lua_newtable (L);
       rawsetfield (L, -2, "__propset");
 
-      lua_pushvalue (L, -2);
-      rawsetfield (L, -2, "__class"); // point to class table
+      lua_pushvalue (L, -2);									//[nm][const][class][tb2][class]
+      rawsetfield (L, -2, "__class");							//[nm][const][class][tb2]
 
       if (Security::hideMetatables ())
       {
@@ -493,12 +493,14 @@ private:
       }
       else
       {
-        rawgetfield (L, -1, "__class");
-        rawgetfield (L, -1, "__const");
+		lua_getmetatable(L, -1);			//[nm][CLASS][__static]
+		lua_remove(L, -2);					//[nm][__static]
+		rawgetfield (L, -1, "__class");		//[nm][__static][__class]
+		rawgetfield (L, -1, "__const");		//[nm][__static][__class][__const]
 
         // Reverse the top 3 stack elements
-        lua_insert (L, -3);
-        lua_insert (L, -2);
+        lua_insert (L, -3);					//[nm][__const][__static][__class]
+        lua_insert (L, -2);					//[nm][__const][__class][__static]
       }
     }
 
