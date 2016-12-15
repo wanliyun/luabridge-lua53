@@ -25,29 +25,99 @@ enum EOpType
 };
 
 
+template<typename T, typename TRight, typename TRet, EOpType opType>
+class FunOperatorImplement
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		assert(false);
+	}
+};
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T,TRight,TRet,EOp__add>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a + b;
+	}
+};
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T, TRight, TRet, EOp__sub>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a - b;
+	}
+};
+
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T, TRight, TRet, EOp__mul>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a * b;
+	}
+};
+
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T, TRight, TRet, EOp__div>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a / b;
+	}
+};
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T, TRight, TRet, EOp__eq>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a == b;
+	}
+};
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T, TRight, TRet, EOp__lt>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a < b;
+	}
+};
+
+
+template<typename T, typename TRight, typename TRet>
+class FunOperatorImplement<T, TRight, TRet, EOp__le>
+{
+public:
+	static TRet doOpMath(const T & a, const TRight & b)
+	{
+		return a <= b;
+	}
+};
+
 template<typename T,typename TRight,typename TRet, EOpType opType>
 class FunOperator
 {
 public:
-	template<EOpType> static TRet doOpMath(const T & a, const TRight & b){
-		return TRet;
-	}
-
-	template<> static TRet doOpMath<EOp__add>(const T & a, const TRight & b) { return a + b; }
-	template<> static TRet doOpMath<EOp__sub>(const T & a, const TRight & b) { return a - b; }
-	template<> static TRet doOpMath<EOp__mul>(const T & a, const TRight & b) { return a * b; }
-	template<> static TRet doOpMath<EOp__div>(const T & a, const TRight & b) { return a / b; }
-
-	template<> static TRet doOpMath<EOp__eq>(const T & a, const TRight & b) { return a == b; }
-	template<> static TRet doOpMath<EOp__lt>(const T & a, const TRight & b) { return a < b; }
-	template<> static TRet doOpMath<EOp__le>(const T & a, const TRight & b) { return a <= b; }
-
 	static int sOperatorFun(lua_State * L)
 	{
 		T a = Stack<T>::get(L, 1);
 		TRight b = Stack<TRight>::get(L, 2);
 
-		TRet ret = doOpMath<opType>(a, b);
+		TRet ret = FunOperatorImplement<T, TRight, TRet, opType>::doOpMath(a, b);
 		Stack <TRet>::push(L, ret);
 		return 1;
 	}
