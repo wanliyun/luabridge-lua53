@@ -53,16 +53,19 @@ struct TypeList
 {
 };
 
+
 /**
   A TypeList with actual values.
 */
 template <typename List>
 struct TypeListValues
 {
+#ifdef LUA_BRIDGE_ENABLE_TYPE_STRING
   static std::string const tostring (bool)
   {
     return "";
   }
+#endif
 };
 
 /**
@@ -79,6 +82,7 @@ struct TypeListValues <TypeList <Head, Tail> >
   {
   }
 
+#ifdef LUA_BRIDGE_ENABLE_TYPE_STRING
   static std::string const tostring (bool comma = false)
   {
     std::string s;
@@ -90,6 +94,7 @@ struct TypeListValues <TypeList <Head, Tail> >
 
     return s + TypeListValues <Tail>::tostring (true);
   }
+#endif
 };
 
 // Specializations of type/value list for head types that are references and
@@ -106,7 +111,7 @@ struct TypeListValues <TypeList <Head&, Tail> >
     : hd (hd_), tl (tl_)
   {
   }
-
+#ifdef LUA_BRIDGE_ENABLE_TYPE_STRING
   static std::string const tostring (bool comma = false)
   {
     std::string s;
@@ -118,6 +123,7 @@ struct TypeListValues <TypeList <Head&, Tail> >
 
     return s + TypeListValues <Tail>::tostring (true);
   }
+#endif
 };
 
 template <typename Head, typename Tail>
@@ -131,6 +137,7 @@ struct TypeListValues <TypeList <Head const&, Tail> >
   {
   }
 
+#ifdef LUA_BRIDGE_ENABLE_TYPE_STRING
   static std::string const tostring (bool comma = false)
   {
     std::string s;
@@ -142,6 +149,7 @@ struct TypeListValues <TypeList <Head const&, Tail> >
 
     return s + TypeListValues <Tail>::tostring (true);
   }
+#endif
 };
 
 //==============================================================================
