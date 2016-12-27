@@ -94,17 +94,6 @@ private:
   }
 
 private:
-	class CEnum
-	{
-	private:
-		CEnum& operator= (CEnum const& other);
-
-	protected:
-		friend class Namespace;
-
-		lua_State* const L;
-		int mutable m_stackSize;
-	};
   /**
     Factored base to reduce template instantiations.
   */
@@ -937,7 +926,7 @@ private:
   class EnumClassBase : public ClassBase
   {
   public:
-	  EnumClassBase(lua_State *L) :ClassBase(L) {}
+	  EnumClassBase(lua_State *L_) :ClassBase(L_) {}
 	  Namespace endEnum()
 	  {
 		  return Namespace(this);
