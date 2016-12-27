@@ -826,6 +826,17 @@ private:
 		return *this;
 	}
 
+	template <class GFn>
+	Class <T>& addGFunction(char const* name, GFn gf)
+	{
+		assert(lua_istable(L, -1));
+		new (lua_newuserdata(L, sizeof(gf))) GFn(gf);
+		lua_pushcclosure(L, &CFunc::Call<GFn>::f, 1);
+		rawsetfield(L, -3, name); // class table
+
+		return *this;
+	}
+
 	static int sToStringFun(lua_State * L)
 	{
 		T * a = Stack<T *>::get(L, 1);
