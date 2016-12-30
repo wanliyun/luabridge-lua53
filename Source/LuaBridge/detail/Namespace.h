@@ -89,7 +89,7 @@ private:
     }
     else
     {
-      throw std::logic_error ("invalid stack");
+		LuaException::Throw(std::logic_error("invalid stack"));
     }
   }
 
@@ -143,7 +143,7 @@ private:
         else
         {
           lua_pop (L, 2);
-          throw std::logic_error ("not a cfunction");
+		  LuaException::Throw(std::logic_error("not a cfunction"));
         }
 
         rawgetfield (L, -1, "__propget");           // get __propget table
@@ -169,7 +169,7 @@ private:
             lua_pop (L, 2);
 
             // We only put cfunctions into __propget.
-            throw std::logic_error ("not a cfunction");
+			LuaException::Throw(std::logic_error("not a cfunction"));
           }
         }
         else
@@ -177,7 +177,7 @@ private:
           lua_pop (L, 2);
 
           // __propget is missing, or not a table.
-          throw std::logic_error ("missing __propget table");
+		  LuaException::Throw(std::logic_error("missing __propget table"));
         }
 
         // Repeat the lookup in the __parent metafield,
@@ -196,8 +196,7 @@ private:
         else
         {
           lua_pop (L, 2);
-
-          throw std::logic_error ("__parent is not a table");
+		  LuaException::Throw(std::logic_error("__parent is not a table"));
         }
       }
 
@@ -398,7 +397,7 @@ private:
       }
       else
       {
-        throw std::logic_error ("invalid stack");
+		LuaException::Throw(std::logic_error("invalid stack"));
       }
     }
 
